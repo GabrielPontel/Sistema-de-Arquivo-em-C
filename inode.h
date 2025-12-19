@@ -9,11 +9,7 @@ void inicializar_inodes()
     if (arq == NULL)
     {
         arq = fopen("fs/inodes.dat", "wb");
-        if (arq == NULL)
-        {
-            printf("\nERRO AO ABRIR O ARQUIVO (INODE.DAT) - FUNCAO INICIALIZAR INODES\n");
-        }
-        else
+        if (validar_abertura_arquivo(arq,"fs/inodes.dat","inicializar_inodes"))
         {
             inode.tipo = 'u';
             for (i = 0; i < quantidade_inode - 1; i++)
@@ -42,11 +38,7 @@ tp_inode retornar_inode_livre()
     num_inode = retornar_inode_livre_superblock();
     if (num_inode != -1)
     {
-        if (arq == NULL)
-        {
-            printf("\nERRO AO ABRIR O ARQUIVO (INODES.DAT) - FUNCAO RETORNAR INODE LIVRE\n");
-        }
-        else
+        if (validar_abertura_arquivo(arq,"fs/inodes.dat","retornar_inode_livre"))
         {
             fseek(arq, num_inode * sizeof(tp_inode), SEEK_SET);
             fread(&inode, sizeof(tp_inode), 1, arq);
@@ -65,11 +57,7 @@ tp_inode retornar_inode(int num)
     arq = fopen("fs/inodes.dat", "rb");
 
     inode.tipo = '-';
-    if (arq == NULL)
-    {
-        printf("\nERRO AO ABRIR O ARQUIVO (INODES.DAT) - RETORNAR INODE\n");
-    }
-    else
+    if (validar_abertura_arquivo(arq,"fs/inodes.dat","retornar_inode"))
     {
         fseek(arq, num * sizeof(tp_inode), SEEK_SET);
         fread(&inode, sizeof(tp_inode), 1, arq);
@@ -84,11 +72,7 @@ void atualiza_inode(tp_inode inode)
     FILE *arq;
     arq = fopen("fs/inodes.dat", "rb+");
 
-    if (arq == NULL)
-    {
-        printf("\nERRO AO ABRIR O ARQUIVO (INODES.DAT) - FUNCAO INSERIR INODE\n");
-    }
-    else
+    if (validar_abertura_arquivo(arq,"fs/inodes.dat","atualiza_inode"))
     {
         fseek(arq, inode.num * sizeof(tp_inode), SEEK_SET);
         fwrite(&inode, sizeof(tp_inode), 1, arq);
@@ -106,11 +90,7 @@ void libera_inode(tp_inode inode)
     inode.tipo = 'u';
     inode.tamanho = 0;
     gravar_inode_livre_superblock(inode.num);
-    if (arq == NULL)
-    {
-        printf("\nERRO AO ABRIR O ARQUIVO (INODES.DAT) - FUNCAO INSERIR INODE\n");
-    }
-    else
+    if (validar_abertura_arquivo(arq,"fs/inodes.dat","libera_inode"))
     {
         fseek(arq, inode.num * sizeof(tp_inode), SEEK_SET);
         fwrite(&inode, sizeof(tp_inode), 1, arq);

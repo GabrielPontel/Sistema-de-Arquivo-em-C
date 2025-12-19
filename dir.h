@@ -1,3 +1,183 @@
+// Cria o diretório raiz caso seja necessário.
+void criar_diretorio_raiz()
+{
+    int valida;
+    tp_inode inode;
+    tp_entrada_diretorio entrada_diretorio;
+
+    inode = retornar_inode_livre();
+    if(inode.num == 0)
+    {
+        inode.blocos[0] = ocupa_bloco_mapa();
+        if(valida_novo_bloco(inode.blocos[0]))
+        {
+            inode.tipo = 'd';
+            inode.qtd_blocos = 1;
+            inode.tamanho = retornar_blocksize();
+
+            strcpy(entrada_diretorio.nome, ".");
+            entrada_diretorio.num_inode = inode.num;
+            gravar_entrada_diretorio(inode.blocos[0], entrada_diretorio);
+
+            strcpy(entrada_diretorio.nome, "..");
+            entrada_diretorio.num_inode = inode.num;
+            gravar_entrada_diretorio(inode.blocos[0], entrada_diretorio);
+            atualiza_inode(inode);
+        }
+    }
+}
+
+//Grava a entrada de diret�rio no final de um determinado bloco, tendo seu numero passado por parametro.
+void gravar_entrada_diretorio(int num, tp_entrada_diretorio entrada_diretorio)
+{
+    FILE *arq;
+    char caminho[30];
+    converter_inteiro_block(num,caminho);
+    arq = fopen(caminho, "ab");
+
+    if(validar_abertura_arquivo(arq,caminho,"gravar_entrada_diretorio"))
+    {
+        fwrite(&entrada_diretorio,sizeof(tp_entrada_diretorio), 1,arq);
+        fclose(arq);
+    }
+}
+
+// Retorna a entrada de diret�rio de acordo com seu inode e bloco onde se encontra.
+tp_entrada_diretorio retornar_entrada_diretorio(int num_bloco, int num_inode_procurado)
+{
+    FILE *arq;
+    char caminho[30];
+    tp_entrada_diretorio aux;
+    int quantidade_entradas;
+
+    converter_inteiro_block(num_bloco,caminho);
+    arq = fopen(caminho, "rb");
+    aux.num_inode = -1;
+
+    if(validar_abertura_arquivo(arq, caminho, "retornar_entrada_diretorio"))
+    {
+        fread(&aux, sizeof(tp_entrada_diretorio), 1, arq);
+        while(!feof(arq) && aux.num_inode != num_inode_procurado)
+        {
+            fread(&aux, sizeof(tp_entrada_diretorio), 1, arq);
+        }
+        if(aux.num_inode != num_inode_procurado)
+            aux.num_inode = -1;
+
+        fclose(arq);
+    }
+    return aux;
+}
+
+// Retornar a ultima entrada de diretorio do bloco.
+tp_entrada_diretorio retornar_ultima_entrada_diretorio(int num_bloco)
+{
+    FILE *arq;
+    char caminho[30];
+    tp_entrada_diretorio aux,ant;
+    int quantidade_entradas;
+
+    ant.num_inode = -1;
+
+    converter_inteiro_block(num_bloco,caminho);
+    arq = fopen(caminho, "rb");
+
+    if(validar_abertura_arquivo(arq,caminho,"retornar_ultima_entrada_diretorio"))
+    {
+        while(fread(&aux, sizeof(tp_entrada_diretorio), 1, arq))
+        {
+            ant = aux;
+
+        }
+        fclose(arq);
+    }
+    return ant;
+}
+
+// Retorna a quantidade de entradas de um bloco
+int retornar_quantidade_entrada_diretorio(int num_bloco)
+{
+    tp_entrada_diretorio entrada_diretorio;
+    char caminho[30];
+    int cont = 0;
+    FILE *arq;
+
+    converter_inteiro_block(num_bloco, caminho);
+    arq = fopen(caminho, "rb");
+
+    if(validar_abertura_arquivo(arq,caminho,"retornar_quantidade_entrada_diretorio"))
+    {
+
+        fread(&entrada_diretorio, sizeof(tp_entrada_diretorio), 1, arq);
+        while(!feof(arq))
+        {
+            cont++;
+            fread(&entrada_diretorio, sizeof(tp_entrada_diretorio), 1, arq);
+        }
+
+        fclose(arq);
+    }
+
+    return cont;
+}
+
+// Exclui uma entrada de um bloco
+int excluir_entrada_diretorio(int num_bloco, int num_inode_procurado)
+{
+    FILE *origem, *destino;
+    char caminho[30];
+    tp_entrada_diretorio entrada_diretorio;
+    int valida = -1;
+
+    converter_inteiro_block(num_bloco,caminho);
+    origem = fopen(caminho, "rb");
+    destino = fopen("auxiliar.dat", "wb");
+
+    if(validar_abertura_arquivo(origem,caminho,"excluir_entrada_diretorio") && validar_abertura_arquivo(destino,"auxiliar.dat","excluir_entrada_diretorio"))
+    {
+        while(fread(&entrada_diretorio, sizeof(tp_entrada_diretorio), 1, origem))
+        {
+            if(entrada_diretorio.num_inode == num_inode_procurado)
+            {
+                valida = 1;
+            }
+            else
+            {
+                fwrite(&entrada_diretorio, sizeof(tp_entrada_diretorio), 1, destino);
+            }
+        }
+
+        fclose(origem);
+        fclose(destino);
+
+        remove(caminho);
+        rename("auxiliar.dat", caminho);
+    }
+    return valida;
+}
+
+// Apresenta as entradas de diret�rio de um bloco.
+void apresentar_entrada(int num_bloco)
+{
+    FILE *arq;
+    char caminho[30];
+    tp_entrada_diretorio aux;
+
+    converter_inteiro_block(num_bloco,caminho);
+    arq = fopen(caminho, "rb");
+
+    if(validar_abertura_arquivo(arq,caminho,"apresentar_entrada"))
+    {
+        fread(&aux, sizeof(tp_entrada_diretorio), 1, arq);
+        while(!feof(arq) )
+        {
+            printf("\n\n%d", aux.num_inode);
+            printf("\n%s", aux.nome);
+            fread(&aux, sizeof(tp_entrada_diretorio), 1, arq);
+        }
+    }
+}
+
 // Grava uma entrada de diretório no diretório pai.
 int gravar_entrada_diretorio_pai(int num_inode, tp_entrada_diretorio entrada_filho)
 {
@@ -41,15 +221,17 @@ int gravar_entrada_diretorio_pai(int num_inode, tp_entrada_diretorio entrada_fil
 }
 
 //Fun��o que le as entradas de diretorio de um arquivo e coloca em uma arvore binaria
-tp_no* ler_todas_entradas_inode(int num_inode, tp_no *raiz)
+tp_no* ler_todas_entradas_inode(int num_inode)
 {
     tp_entrada_diretorio auxiliar;
     tp_inode inode;
+    tp_no *raiz;
     int bloco_desejado, i;
     char nomearq[15];
     char caminho[30];
     FILE *arq;
 
+    inicializar_arvore(&raiz);
     inode = retornar_inode(num_inode);
 
     if (inode.qtd_blocos <= 0)
@@ -61,17 +243,9 @@ tp_no* ler_todas_entradas_inode(int num_inode, tp_no *raiz)
         for (i = 0; i < inode.qtd_blocos; i++)
         {
             bloco_desejado = inode.blocos[i];
-            strcpy(caminho,"fs/blocks/");
-            sprintf(nomearq, "%d", bloco_desejado);
-            strcat(caminho, nomearq);
-            strcat(caminho,".dat");
+            converter_inteiro_block(bloco_desejado,caminho);
             arq = fopen(caminho, "rb");
-            if (arq == NULL)
-            {
-                printf("\nERRO AO ABRIR ARQUIVO (%s) - funcao ler_todas_entradas_inode\n", nomearq);
-            }
-            else
-            {
+            if(validar_abertura_arquivo(arq,caminho,"ler_todas_entradas_inode"))
                 while (fread(&auxiliar, sizeof(tp_entrada_diretorio), 1, arq) == 1)
                 {
                     raiz = inserir_arvore(raiz,auxiliar);
@@ -79,7 +253,7 @@ tp_no* ler_todas_entradas_inode(int num_inode, tp_no *raiz)
                 fclose(arq);
             }
         }
-    }
+
     return raiz;
 }
 
@@ -90,11 +264,36 @@ int verificar_nome_diretorio(int num_dir, char *nome_arq)
     tp_no *raiz;
 
     valida = 1;
-    inicializar_arvore(&raiz);
-    raiz = ler_todas_entradas_inode(num_dir, raiz);
-    if(pesquisa_entrada_diretorio(raiz,nome_arq) == NULL)
+    raiz = ler_todas_entradas_inode(num_dir);
+    if(pesquisa_entrada_diretorio(raiz,nome_arq) != NULL)
+    {
         valida = 0;
+        printf("\nJA EXISTE ARQUIVO COM ESSE NOME NO DIRETORIO!!");
+    }
     return valida;
+}
+
+//Percorre um diretório apagando os arquivos e diretóriuos de dentro pela árvore.
+void apagar_dentro_diretorio(tp_no *raiz)
+{
+    tp_inode inode;
+    if(raiz != NULL)
+    {
+        if(strcmp(raiz->info.nome,".")!=0 && strcmp(raiz->info.nome,"..")!=0)
+        {
+            inode = retornar_inode(raiz->info.num_inode);
+            if(inode.tipo == 'd')
+            {
+                apagar_diretorio(inode.num);
+            }
+            else
+            {
+                apagar_arquivo(inode.num);
+            }
+        }
+        apagar_dentro_diretorio(raiz->dir);
+        apagar_dentro_diretorio(raiz->esq);
+    }
 }
 
 //Fun��o para apagar um diret�rio
@@ -105,29 +304,8 @@ void apagar_diretorio(int num_inode)
     tp_entrada_diretorio *vetor_entradas;
     int i=0, tl;
 
-    inicializar_arvore(&raiz);
-
-    raiz = ler_todas_entradas_inode(num_inode,raiz);
-    tl = contar_nos(raiz);
-    vetor_entradas = (tp_entrada_diretorio*) malloc(sizeof(tp_entrada_diretorio)*tl);
-    arvore_para_vetor(raiz,vetor_entradas,&i);
-    for(i=0; i<tl; i++)
-    {
-
-        if(strcmp(vetor_entradas[i].nome,".")!=0 && strcmp(vetor_entradas[i].nome,"..")!=0)
-        {
-            inode = retornar_inode(vetor_entradas[i].num_inode);
-            if(inode.tipo == 'd')
-            {
-                apagar_diretorio(inode.num);
-            }
-            else
-            {
-                apagar_arquivo(inode.num);
-            }
-        }
-    }
-    free(vetor_entradas);
+    raiz = ler_todas_entradas_inode(num_inode);
+    apagar_dentro_diretorio(raiz);
     inode = retornar_inode(num_inode);
     for(i=0; i<inode.qtd_blocos; i++)
     {

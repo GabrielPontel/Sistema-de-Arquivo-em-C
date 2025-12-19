@@ -4,13 +4,13 @@ tp_no* getnode()
     return (tp_no*) malloc(sizeof(tp_no));
 }
 
-//Fun��o para inicializar a arvore
+//Inicializa a árvore.
 void inicializar_arvore(tp_no **raiz)
 {
     *raiz = NULL;
 }
 
-// Fun��o recursiva para contar os n�s da �rvore
+// Conta a quantidade de nós a árvore apresenta.
 int contar_nos(tp_no *raiz)
 {
     if (raiz == NULL)
@@ -19,7 +19,7 @@ int contar_nos(tp_no *raiz)
         return 1 + contar_nos(raiz->esq) + contar_nos(raiz->dir);
 }
 
-//Fun��o para inserir um elemento na arvore
+//Insere uma nova entrada de diretório na árvore.
 tp_no* inserir_arvore(tp_no *raiz, tp_entrada_diretorio elemento)
 {
     if(raiz == NULL)
@@ -44,7 +44,7 @@ tp_no* inserir_arvore(tp_no *raiz, tp_entrada_diretorio elemento)
 }
 
 
-//Fun��o para encontrar um elemento na arvore
+//Encontrar um elemento na árvore.
 tp_no* pesquisa_entrada_diretorio(tp_no *raiz, char nome_arquivo[])
 {
     if(raiz==NULL)
@@ -65,7 +65,7 @@ tp_no* pesquisa_entrada_diretorio(tp_no *raiz, char nome_arquivo[])
     }
 }
 
-// Fun��o que imprime uma �rvore de entradas em ordem
+// Imprime os elementos da árvore em ordem alfabética 
 void listar_em_ordem(tp_no *raiz)
 {
     tp_inode inode;
@@ -79,17 +79,5 @@ void listar_em_ordem(tp_no *raiz)
         printf("%c - %-5d %-20s %5d\n", inode.tipo, raiz->info.num_inode, raiz->info.nome, inode.tamanho);
 
         listar_em_ordem(raiz->dir);
-    }
-}
-
-//Fun��o que converte a arvore para vetor
-void arvore_para_vetor(tp_no *raiz, tp_entrada_diretorio vetor[], int *indice)
-{
-    if (raiz != NULL)
-    {
-        arvore_para_vetor(raiz->esq, vetor, indice);
-        vetor[*indice] = raiz->info;
-        (*indice)++;
-        arvore_para_vetor(raiz->dir, vetor, indice);
     }
 }

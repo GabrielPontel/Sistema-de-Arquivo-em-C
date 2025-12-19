@@ -6,7 +6,7 @@ void gravar_superblock()
     if (arq == NULL)
     {
         arq = fopen("fs/superblock.dat", "w");
-        if (arq != NULL)
+        if (validar_abertura_arquivo(arq,"fs/superblock.dat","gravar_superblock"))
         {
             fputs("filesystem=togabifs\n"
                   "blocksize=128\n"
@@ -15,10 +15,6 @@ void gravar_superblock()
                   arq);
 
             fclose(arq);
-        }
-        else
-        {
-            printf("ERRO AO TENTAR ABRIR O ARQUIVO(SUPERBLOCK.DAT) - FUNCAO GRAVAR SUPERBLOCK\n");
         }
     }
 }
@@ -38,11 +34,7 @@ void gravar_inode_livre_superblock(int num_inode)
     }
 
     arq = fopen("fs/superblock.dat", "r+"); // abre para leitura e escrita
-    if (arq == NULL)
-    {
-        printf("\nERRO AO ABRIR O ARQUIVO (SUPERBLOCK.DAT)\n");
-    }
-    else
+    if (validar_abertura_arquivo(arq,"fs/superblock.dat","gravar_inode_livre_superblock"))
     {
         fseek(arq, 0, SEEK_END);
         pos = ftell(arq) - 2;
@@ -52,7 +44,7 @@ void gravar_inode_livre_superblock(int num_inode)
     }
 }
 
-//Retorna o num do primeiro inode livre da "lista de livres". 
+//Retorna o num do primeiro inode livre da "lista de livres".
 int retornar_inode_livre_superblock()
 {
     FILE *arq;
@@ -60,11 +52,7 @@ int retornar_inode_livre_superblock()
     int num_inode = -1;
 
     arq = fopen("fs/superblock.dat", "r");
-    if (arq == NULL)
-    {
-        printf("\nERRO AO ABRIR O ARQUIVO(SUPERBLOCK.DAT) - FUNCAO RETORNAR BLOCKSIZE\n");
-    }
-    else
+    if (validar_abertura_arquivo(arq,"fs/superblock.dat","retornar_inode_livre_superblock"))
     {
         while (fgets(linha, sizeof(linha), arq) != NULL)
         {
@@ -86,11 +74,7 @@ int retornar_blocksize()
     int blocksize = -1;
 
     arq = fopen("fs/superblock.dat", "r");
-    if (arq == NULL)
-    {
-        printf("\nERRO AO ABRIR O ARQUIVO(SUPERBLOCK.DAT) - FUNCAO RETORNAR BLOCKSIZE\n");
-    }
-    else
+    if (validar_abertura_arquivo(arq,"fs/superblock.dat","retornar_blocksize"))
     {
         while (fgets(linha, sizeof(linha), arq) != NULL)
         {
@@ -113,11 +97,7 @@ int retornar_partition()
 
     arq = fopen("fs/superblock.dat", "r");
 
-    if (arq == NULL)
-    {
-        printf("\nERRO AO ABRIR O ARQUIVO(SUPERBLOCK.DAT) - FUNCAO RETORNAR PARTITION\n");
-    }
-    else
+    if (validar_abertura_arquivo(arq,"fs/superblock.dat","retornar_partition"))
     {
         while (fgets(linha, sizeof(linha), arq) != NULL)
         {
