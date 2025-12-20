@@ -1,5 +1,15 @@
+// Inicializa todos os arquivos necessários ao sistema de arquivos.
+void inicializar_dados()
+{
+    criar_diretorio();
+    gravar_superblock();
+    inicializar_mapa_bits();
+    inicializar_inodes();
+    criar_blocos();
+    criar_diretorio_raiz();
+}
 
-// Fun��o para criar um diretorio
+// Cria um novo diretório dentro do diretório atual.
 void mkdir_(int num_ant, char *nome_arq)
 {
     int valida;
@@ -8,9 +18,9 @@ void mkdir_(int num_ant, char *nome_arq)
     if (validar_nome_arquivo(nome_arq) && verificar_nome_diretorio(num_ant, nome_arq))
     {
         inode = retornar_inode_livre();
-        inode .blocos[0] = ocupa_bloco_mapa();
+        inode.blocos[0] = ocupa_bloco_mapa();
 
-        if(valida_inode(inode) && valida_novo_bloco(inode.blocos[0]))
+        if (valida_inode(inode) && valida_novo_bloco(inode.blocos[0]))
         {
             reseta_bloco(inode.blocos[0]);
 
@@ -21,6 +31,7 @@ void mkdir_(int num_ant, char *nome_arq)
 
             atualiza_inode(inode);
 
+            // Grava nesse novo diretório as entradas . e .. .
             strcpy(entrada_diretorio.nome, ".");
             entrada_diretorio.num_inode = inode.num;
             gravar_entrada_diretorio(inode.blocos[0], entrada_diretorio);
@@ -32,7 +43,9 @@ void mkdir_(int num_ant, char *nome_arq)
             strcpy(entrada_diretorio.nome, nome_arq);
             entrada_diretorio.num_inode = inode.num;
 
+            // Grava essa nova entrada de diretório no diretório atual.
             valida = gravar_entrada_diretorio_pai(num_ant, entrada_diretorio);
+            // Se o diretório atual estiver cheio deve liberar o inode e o bloco.
             if (valida == -1)
             {
                 libera_bloco_mapa(inode.blocos[0]);
@@ -42,7 +55,7 @@ void mkdir_(int num_ant, char *nome_arq)
     }
 }
 
-// Funcao touch cria um arquivo e grava o conteudo
+// Cria um novo arquivo dentro do diretório atual.
 void touch(int num_pai, char nome_arquivo[])
 {
     tp_inode inode;
@@ -59,11 +72,16 @@ void touch(int num_pai, char nome_arquivo[])
 
         inode = retornar_inode_livre();
 
-        if(valida_inode(inode))
+        // Aloca um inode.
+        if (valida_inode(inode))
         {
             inode.tipo = 'f';
+
+            // Le o texto no qual o usuario deseja armazenar.
             ler_arquivo(conteudo, tam);
             tamanho_total = strlen(conteudo);
+
+            // Calcula a quantidade de blocos necessarios para armazenar o arquivo.
             num_blocos_necessarios = (tamanho_total) / blocksize;
             if (tamanho_total % blocksize != 0)
                 num_blocos_necessarios++;
@@ -76,6 +94,8 @@ void touch(int num_pai, char nome_arquivo[])
             {
                 valida = 1;
                 i = 0;
+
+                // Tenta alocar todos os blocos necessarios.
                 while (i < num_blocos_necessarios && valida == 1)
                 {
                     inode.blocos[i] = ocupa_bloco_mapa();
@@ -89,6 +109,8 @@ void touch(int num_pai, char nome_arquivo[])
                 if (valida == 1)
                 {
                     inode.qtd_blocos = num_blocos_necessarios;
+
+                    // Com a alocação dos blocos efetuada, grava o conteudo em cada bloco.
                     for (i = 0; i < num_blocos_necessarios; i++)
                     {
 
@@ -116,6 +138,7 @@ void touch(int num_pai, char nome_arquivo[])
 
                     verifica_pai = gravar_entrada_diretorio_pai(num_pai, entrada_diretorio);
                 }
+                // Caso não foi possivel alocar todos os blocos os que tinha sido reservados seram liberados novamente.
                 if (valida == -1 || verifica_pai == -1)
                 {
                     j = 0;
@@ -131,7 +154,8 @@ void touch(int num_pai, char nome_arquivo[])
         }
     }
 }
-// Fun��o para separar as instru��es do cd, se retornar -1 significa que tem alguem diretorio
+
+// Separa os diretórios em um vetor de string.
 int separar_comando_cd(char texto[], char matriz_dicionarios[][15])
 {
     int tl, i, j, tamanho_nome;
@@ -142,6 +166,7 @@ int separar_comando_cd(char texto[], char matriz_dicionarios[][15])
     while (i < strlen(texto) && tl > -1)
     {
         j = 0;
+        // Cada vez que encontra um / separa a string e armazena no vetor.
         while (i < strlen(texto) && texto[i] != '/')
         {
             matriz_dicionarios[tl][j] = texto[i];
@@ -158,7 +183,7 @@ int separar_comando_cd(char texto[], char matriz_dicionarios[][15])
     return tl;
 }
 
-// Fun��o cd
+// Entrar em um diretório a partir do diretório atual.
 int cd(int num_inode, char caminho[], char comando[])
 {
     char matriz_diretorios[15][15];
@@ -166,6 +191,7 @@ int cd(int num_inode, char caminho[], char comando[])
     tp_no *raiz;
     tp_inode inode;
 
+    // Se o usuario deseja voltar ao diretório anterior.
     if (strcmp(comando, "..") == 0)
     {
         raiz = ler_todas_entradas_inode(num_inode);
@@ -183,11 +209,13 @@ int cd(int num_inode, char caminho[], char comando[])
         if (strcmp(caminho, "") == 0)
             strcpy(caminho, "/");
     }
+    // Se o usuario deseja voltar ao diretório raiz.
     else if (strcmp(comando, "/") == 0)
     {
         num_inode = 0;
         strcpy(caminho, "/");
     }
+    // Caso ele quis percorrer algum caminho.
     else if (strcmp(comando, ".") != 0)
     {
         tl = separar_comando_cd(comando, matriz_diretorios);
@@ -244,12 +272,10 @@ int cd(int num_inode, char caminho[], char comando[])
     return num_inode;
 }
 
-// Listar todos os arquivos do diret�rio atual
+// Listar todos os arquivos do diretório atual.
 void ls(int num_diretorio)
 {
-
     tp_no *raiz;
-
     raiz = ler_todas_entradas_inode(num_diretorio);
 
     if (raiz == NULL)
@@ -262,12 +288,13 @@ void ls(int num_diretorio)
     }
 }
 
-// Busca em �rvore bin�ria pelo nome do diret�rio com o inode
+// Busca em árvore binária pelo nome do diretário a partir do inode.
 int buscar_nome_por_inode(tp_no *raiz, int num_inode, char *nome_encontrado)
 {
     int valida = 0;
     if (raiz != NULL)
     {
+        // Verifica se o nó atual contem o inode desejado.
         if (raiz->info.num_inode == num_inode && strcmp(raiz->info.nome, ".") != 0 && strcmp(raiz->info.nome, "..") != 0)
         {
             strcpy(nome_encontrado, raiz->info.nome);
@@ -276,6 +303,7 @@ int buscar_nome_por_inode(tp_no *raiz, int num_inode, char *nome_encontrado)
 
         if (valida == 0)
         {
+            // Percorendo a árvore.
             if (buscar_nome_por_inode(raiz->esq, num_inode, nome_encontrado))
                 valida = 1;
             if (buscar_nome_por_inode(raiz->dir, num_inode, nome_encontrado))
@@ -285,7 +313,7 @@ int buscar_nome_por_inode(tp_no *raiz, int num_inode, char *nome_encontrado)
     return valida;
 }
 
-// Fun�ao pwd mostra em que diretorio esta
+// Apresenta a localização atual dentro do sistema de arquivo.
 void pwd(int num_inode_atual)
 {
     tp_inode inode_atual, inode_pai;
@@ -310,6 +338,8 @@ void pwd(int num_inode_atual)
         achou = buscar_nome_por_inode(raiz_pai, num_inode_atual, nome);
 
         aux[0] = '\0';
+        // Se encontrou o nome desejado ele deve ser colocado ao inicio da string,
+        // ja que esta fazendo o caminho comecando do atual que seria o final.
         if (achou && strlen(nome) > 0)
         {
             strcat(aux, "/");
@@ -330,7 +360,7 @@ void pwd(int num_inode_atual)
     printf("%s\n", caminho);
 }
 
-// Apresentar o conte�do de um arquivo (no diret�rio atual)
+// Apresentar o conteudo de um arquivo no diretório atual.
 void cat(int num_diretorio_atual, char nome_arquivo[])
 {
     tp_no *raiz;
@@ -359,7 +389,7 @@ void cat(int num_diretorio_atual, char nome_arquivo[])
         }
         else
         {
-
+            // Apresneta todos os blocos do arquivo.
             for (i = 0; i < inode.qtd_blocos; i++)
             {
                 apresentar_bloco(inode.blocos[i]);
@@ -369,7 +399,8 @@ void cat(int num_diretorio_atual, char nome_arquivo[])
 
     printf("\n");
 }
-// Fun��o para excluir um arquivo ou diret�rio do atual
+
+// Exclui um arquivo ou diretório do diretório atual.
 void rm(int inode_pai, char nome_arq[])
 {
     tp_no *raiz;
@@ -380,6 +411,7 @@ void rm(int inode_pai, char nome_arq[])
     desejado = pesquisa_entrada_diretorio(raiz, nome_arq);
     if (desejado != NULL)
     {
+        // Verifica se o nome arquivo não é . e .. e verifica se é arquivo ou diretório para ser excluido.
         if (strcmp(nome_arq, ".") != 0 && strcmp(nome_arq, "..") != 0)
         {
             inode = retornar_inode(desejado->info.num_inode);
@@ -402,7 +434,7 @@ void rm(int inode_pai, char nome_arq[])
     }
 }
 
-// Fun��o stat que vai apresentar a situa��o do sistema de arquivo
+// Apresenta a situação do sistema de aruivos com gerenciamento do espaco.
 void stat()
 {
     int qtd_livres_bytes, qtd_blocos_livres, tam_bloco;
@@ -417,7 +449,7 @@ void stat()
     printf("\nTAMANHO DO BLOCO: %d BYTES", tam_bloco);
 }
 
-//Apresneta para o usuário as opções que o programa contem.
+// Apresenta ao usuário as opções que o programa contem.
 void help()
 {
     printf("============================ COMANDOS DISPONIVEIS ============================\n"

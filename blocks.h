@@ -9,10 +9,12 @@ void criar_blocos()
     {
         converter_inteiro_block(i, caminho);
         arq = fopen(caminho, "r");
+        // verifica se este bloco(arquivo) já estava inserido no sistema, caso contrario o cria.
         if (arq == NULL)
         {
             arq = fopen(caminho, "w");
-            if(validar_abertura_arquivo(arq,caminho,"criar_blocos"));
+            if (validar_abertura_arquivo(arq, caminho, "criar_blocos"))
+                ;
         }
         fclose(arq);
     }
@@ -27,7 +29,7 @@ void reseta_bloco(int num_bloco)
     origem = fopen(caminho, "rb");
     destino = fopen("auxiliar.dat", "wb");
 
-    if (validar_abertura_arquivo(origem,caminho,"reseta_bloco")&&validar_abertura_arquivo(destino,"auxiliar.dat","reseta_bloco"))
+    if (validar_abertura_arquivo(origem, caminho, "reseta_bloco") && validar_abertura_arquivo(destino, "auxiliar.dat", "reseta_bloco"))
     {
         fclose(origem);
         fclose(destino);
@@ -44,7 +46,7 @@ void gravar_bloco(int num, char string[])
     char caminho[30];
     converter_inteiro_block(num, caminho);
     arq = fopen(caminho, "w");
-    if (validar_abertura_arquivo(arq,caminho,"gravar_bloco"))
+    if (validar_abertura_arquivo(arq, caminho, "gravar_bloco"))
     {
         fputs(string, arq);
         fclose(arq);
@@ -61,7 +63,7 @@ void apresentar_bloco(int num)
     converter_inteiro_block(num, caminho);
     arq = fopen(caminho, "r");
 
-    if (validar_abertura_arquivo(arq,caminho,"apresentar_bloco"))
+    if (validar_abertura_arquivo(arq, caminho, "apresentar_bloco"))
     {
         while (fgets(linha, sizeof(linha), arq) != NULL)
             printf("%s", linha);

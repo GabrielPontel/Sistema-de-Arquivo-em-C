@@ -1,10 +1,10 @@
-//Reserva espaco em memória.
-tp_no* getnode()
+// Reserva espaco em memória.
+tp_no *getnode()
 {
-    return (tp_no*) malloc(sizeof(tp_no));
+    return (tp_no *)malloc(sizeof(tp_no));
 }
 
-//Inicializa a árvore.
+// Inicializa a árvore.
 void inicializar_arvore(tp_no **raiz)
 {
     *raiz = NULL;
@@ -19,43 +19,42 @@ int contar_nos(tp_no *raiz)
         return 1 + contar_nos(raiz->esq) + contar_nos(raiz->dir);
 }
 
-//Insere uma nova entrada de diretório na árvore.
-tp_no* inserir_arvore(tp_no *raiz, tp_entrada_diretorio elemento)
+// Insere uma nova entrada de diretório na árvore.
+tp_no *inserir_arvore(tp_no *raiz, tp_entrada_diretorio elemento)
 {
-    if(raiz == NULL)
+    if (raiz == NULL)
     {
         tp_no *q;
-        q=getnode();
+        q = getnode();
         strcpy(q->info.nome, elemento.nome);
         q->info.num_inode = elemento.num_inode;
         q->esq = NULL;
         q->dir = NULL;
         return q;
     }
-    else if(strcmp(raiz->info.nome, elemento.nome)>=0)
+    else if (strcmp(raiz->info.nome, elemento.nome) >= 0)
     {
-        raiz->esq = inserir_arvore(raiz->esq,elemento);
+        raiz->esq = inserir_arvore(raiz->esq, elemento);
     }
     else
     {
-        raiz->dir = inserir_arvore(raiz->dir,elemento);
+        raiz->dir = inserir_arvore(raiz->dir, elemento);
     }
     return raiz;
 }
 
-
-//Encontrar um elemento na árvore.
-tp_no* pesquisa_entrada_diretorio(tp_no *raiz, char nome_arquivo[])
+// Encontrar um elemento na árvore, lembrando que ela é ordenada alfabeticamente.
+tp_no *pesquisa_entrada_diretorio(tp_no *raiz, char nome_arquivo[])
 {
-    if(raiz==NULL)
+    if (raiz == NULL)
     {
         return NULL;
     }
-    else if(strcmp(raiz->info.nome,nome_arquivo)<0)
+    else if (strcmp(raiz->info.nome, nome_arquivo) < 0)
     {
         return pesquisa_entrada_diretorio(raiz->dir, nome_arquivo);
     }
-    else if(strcmp(raiz->info.nome,nome_arquivo)>0)
+    else if (strcmp(raiz->info.nome, nome_arquivo) > 0)
     {
         return pesquisa_entrada_diretorio(raiz->esq, nome_arquivo);
     }
@@ -65,7 +64,7 @@ tp_no* pesquisa_entrada_diretorio(tp_no *raiz, char nome_arquivo[])
     }
 }
 
-// Imprime os elementos da árvore em ordem alfabética 
+// Imprime os elementos da árvore em ordem alfabética.
 void listar_em_ordem(tp_no *raiz)
 {
     tp_inode inode;

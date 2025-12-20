@@ -25,7 +25,7 @@ void inicializar_mapa_bits()
     if (arq == NULL)
     {
         arq = fopen("fs/freespace.dat", "wb");
-        if(validar_abertura_arquivo(arq,"fs/freespace.dat","inicializar_mapa_bits"))
+        if (validar_abertura_arquivo(arq, "fs/freespace.dat", "inicializar_mapa_bits"))
         {
             for (i = 0; i < quantidade_caracteres; i++)
             {
@@ -43,7 +43,7 @@ void obter_mapa_bits(unsigned char mapa[])
     FILE *arq;
     tam = calcular_quantidade_blocos();
     arq = fopen("fs/freespace.dat", "rb");
-    if(validar_abertura_arquivo(arq,"fs/freespace.dat","obter_mapa_bits"))
+    if (validar_abertura_arquivo(arq, "fs/freespace.dat", "obter_mapa_bits"))
     {
         while (fread(&mapa[i], sizeof(unsigned char), 1, arq) == 1)
         {
@@ -64,7 +64,7 @@ void libera_bloco_mapa(int num_bloco)
     if (num_bloco < quantidade_blocos && num_bloco > -1)
     {
         arq = fopen("fs/freespace.dat", "rb+");
-        if (validar_abertura_arquivo(arq,"fs/freespace.dat","libera_bloco_mapa"))
+        if (validar_abertura_arquivo(arq, "fs/freespace.dat", "libera_bloco_mapa"))
         {
             posicao_caracter = num_bloco / 8;
             posicao_bit = (((num_bloco % 8) - 8) * -1) - 1;
@@ -103,7 +103,7 @@ void grava_bloco_ocupado_mapa(int num_bloco)
     if (num_bloco < quantidade_blocos && num_bloco > -1)
     {
         arq = fopen("fs/freespace.dat", "rb+");
-        if(validar_abertura_arquivo(arq,"fs/freespace.dat","grava_bloco_ocupado_mapa"))
+        if (validar_abertura_arquivo(arq, "fs/freespace.dat", "grava_bloco_ocupado_mapa"))
         {
             posicao_caracter = num_bloco / 8;
             posicao_bit = (((num_bloco % 8) - 8) * -1) - 1;
