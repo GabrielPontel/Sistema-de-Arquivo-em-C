@@ -8,7 +8,7 @@ void gravar_superblock()
         arq = fopen("fs/superblock.dat", "w");
         if (validar_abertura_arquivo(arq, "fs/superblock.dat", "gravar_superblock"))
         {
-            fputs("filesystem=togabifs\n"
+            fputs("filesystem=gamegafs\n"
                   "blocksize=128\n"
                   "partitionsize=10240\n"
                   "next=00",
@@ -121,3 +121,4 @@ int calcular_quantidade_blocos()
 
     return qtd_blocos;
 }
+
