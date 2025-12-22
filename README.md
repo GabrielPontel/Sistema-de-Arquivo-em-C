@@ -25,11 +25,12 @@ Nesse sentido, com o conhecimento teórico do sistema EXT3 foi codificado divers
 </div>
 
 ## _Desenvolvedor_:
-<div>
-<a href="https://github.com/GabrielPontel" target="_blank">
+
  <img src="https://github.com/GabrielPontel.png" width="150" alt="Foto do perfil GitHub">
+<a href="https://github.com/GabrielPontel" target="_blank">
+<h>GabrielPontel</h>
 </a>
-</div>
+  
 
 
 
