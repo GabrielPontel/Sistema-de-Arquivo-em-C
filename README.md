@@ -19,7 +19,7 @@ Nesse sentido, com o conhecimento teórico do sistema EXT3 foi codificado divers
 - commands.h: Define os comandos disponíveis para o usuário, funcionando como uma camada de interface entre a entrada do usuário e as funções internas do sistema de arquivos.
 - util.h: Agrupa funções auxiliares e utilitárias, como validações, manipulação de strings, conversões e rotinas de apoio usadas em diferentes partes do sistema.
 
-## _Linguagem utilizada_:
+## _Tecnologias_:
 <div>
   <img align-"center" alt="C" src="https://img.shields.io/badge/C-00599C?style=for-the-badge&logo=c&logoColor=white">
 </div>
