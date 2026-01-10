@@ -431,7 +431,7 @@ void rm(int inode_pai, char nome_arq[])
 }
 
 // Apresenta a situa��o do sistema de aruivos com gerenciamento do espaco.
-void t_stat()
+void stats()
 {
     int qtd_livres_bytes, qtd_blocos_livres, tam_bloco;
 
@@ -451,7 +451,7 @@ void help()
     printf("============================ COMANDOS DISPONIVEIS ============================\n"
            "- cat <arquivo>\n"
            "    EXIBE O CONTEUDO DO ARQUIVO INFORMADO.\n"
-           "- cd <diret�rio>\n"
+           "- cd <diretorio>\n"
            "    ALTERA O DIRETORIO ATUAL PELO O INFORMADO.\n"
            "- help\n"
            "    MOSTRA A LISTA DE COMANDOS DISPONIVEIS E SUAS DESCRICOES.\n"

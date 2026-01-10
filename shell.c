@@ -55,7 +55,7 @@ void main()
             }
             else if (strcmp(comando, "stat") == 0)
             {
-                t_stat();
+                stats();
             }
             else if (strcmp(comando, "exit") == 0)
             {
