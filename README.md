@@ -8,16 +8,18 @@ Nesse sentido, com o conhecimento teórico do sistema EXT3 foi codificado divers
 - Estrutura de diretórios: para organizar as entradas dentro de um diretório, foi utilizada uma árvore binária de busca, a qual possibilita uma alocação eficiente e facilita a pesquisa de arquivos. A navegação na árvore ocorre por meio de comparações lexicográficas entre strings: caso o nome procurado seja lexicograficamente maior que o nó atual, a busca segue para a subárvore da direita; caso contrário, para a subárvore da esquerda.
 
 ## _Arquivos_:
-- structs.h: Centraliza as estruturas básicas do sistema, como structs.
-- superblock.h: Define a estrutura do superbloco, responsável por armazenar informações gerais do sistema de arquivos, como tamanho total, quantidade de blocos, quantidade de inodes e metadados globais.
-- inode.h: Contém a definição e operações relacionadas ao inode, que armazena os metadados de cada arquivo (tipo, tamanho, blocos ocupados, identificador, etc.).
-- blocks.h: Responsável pelo gerenciamento dos blocos de dados, incluindo alocação, liberação e controle via mapa de bits, indicando quais blocos estão livres ou ocupados.
-- freespace.h: Gerencia os inodes livres, utilizando uma estrutura (lista encadeada) que facilita a alocação e reutilização de inodes disponíveis no sistema.
-- dir_structure.h: Define a estrutura interna dos diretórios, como nós da árvore binária, utilizada para organizar e armazenar as entradas de diretório.
-- dir.h: Implementa as operações sobre diretórios, como inserção, busca e remoção de entradas, utilizando a estrutura definida em dir_structure.h.
-- file.h: Contém funções relacionadas à manipulação de arquivos, como criação, leitura, escrita e remoção, fazendo uso de inodes e blocos.
-- commands.h: Define os comandos disponíveis para o usuário, funcionando como uma camada de interface entre a entrada do usuário e as funções internas do sistema de arquivos.
-- util.h: Agrupa funções auxiliares e utilitárias, como validações, manipulação de strings, conversões e rotinas de apoio usadas em diferentes partes do sistema.
+- structs.h: Centraliza as estruturas básicas do sistema, como structs;
+- superblock.h: Define a estrutura do superbloco, responsável por armazenar informações gerais do sistema de arquivos, como tamanho total, quantidade de blocos, quantidade de inodes e metadados globais;
+- inode.h: Contém a definição e operações relacionadas ao inode, que armazena os metadados de cada arquivo (tipo, tamanho, blocos ocupados, identificador, etc.);
+- blocks.h: Responsável pelo gerenciamento dos blocos de dados, incluindo alocação, liberação e controle via mapa de bits, indicando quais blocos estão livres ou ocupados;
+- freespace.h: Gerencia os inodes livres, utilizando uma estrutura (lista encadeada) que facilita a alocação e reutilização de inodes disponíveis no sistema;
+- dir_structure.h: Define a estrutura interna dos diretórios, como nós da árvore binária, utilizada para organizar e armazenar as entradas de diretório;
+- dir.h: Implementa as operações sobre diretórios, como inserção, busca e remoção de entradas, utilizando a estrutura definida em dir_structure.h;
+- file.h: Contém funções relacionadas à manipulação de arquivos, como criação, leitura, escrita e remoção, fazendo uso de inodes e blocos;
+- commands.h: Define as assinaturas das funções disponíveis para o usuário (Observar: Que isso ocorre, pela opção de implantar o Makefile no sistema, garantindo maior desempenho ao compilar o código);
+- commands.c: Define os comandos disponíveis para o usuário, funcionando como uma camada de interface entre a entrada do usuário e as funções internas do sistema de arquivos;
+- util.h: Agrupa funções auxiliares e utilitárias, como validações, manipulação de strings, conversões e rotinas de apoio usadas em diferentes partes do sistema;
+- shell.c: É o arquivo principal do programa.
 
 ## _Tecnologias_:
 <div>
