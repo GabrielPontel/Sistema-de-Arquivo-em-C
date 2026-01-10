@@ -1,24 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <math.h>
-
-#ifdef __linux__
-#include <sys/stat.h>
-#elif _WIN32
-#include <direct.h>
-#endif
 #include <locale.h>
-#include "structs.h"
-#include "util.h"
-#include "superblock.h"
-#include "freespace.h"
-#include "inode.h"
-#include "blocks.h"
-#include "dir_structure.h"
-#include "file.h"
-#include "dir.h"
 #include "commands.h"
 
 void main()
@@ -73,7 +55,7 @@ void main()
             }
             else if (strcmp(comando, "stat") == 0)
             {
-                stat();
+                t_stat();
             }
             else if (strcmp(comando, "exit") == 0)
             {

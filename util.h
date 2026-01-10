@@ -2,6 +2,42 @@ tp_no *pesquisa_entrada_diretorio(tp_no *raiz, char nome_arquivo[]);
 tp_no *ler_todas_entradas_inode(int num_inode);
 void reseta_bloco(int num_bloco);
 
+// Realiza uma leitura até o usuário digitar enter ou atingir o tamanho máximo.
+void realizar_leitura(char string[], int tam)
+{
+    int i = -1;
+    char c;
+    do
+    {
+        i++;
+        scanf("%c", &c);
+        string[i] = c;
+    } while (i < tam && c != '\n');
+    string[i] = '\0';
+}
+
+// Separa o texto digitado pelo usuário em comando e restante.
+void separar_prompt_usuario(char texto_digitado[], char comando[])
+{
+    int i = 0, j;
+    comando[0] = '\0';
+    while (i < strlen(texto_digitado) && texto_digitado[i] != ' ' && texto_digitado[i] != '/')
+    {
+        comando[i] = texto_digitado[i];
+        i++;
+    }
+    comando[i] = '\0';
+    if (texto_digitado[i] != '\0')
+        i++;
+    for (j = 0; j < strlen(texto_digitado); j++)
+    {
+        texto_digitado[j] = texto_digitado[i];
+        i++;
+    }
+    texto_digitado[j] = '\0';
+}
+
+
 // Converte todas as letras para maiusculas
 void trocar_para_maiusculo(char string[])
 {
@@ -97,40 +133,7 @@ void criar_diretorio()
 #endif
 }
 
-// Realiza uma leitura até o usuário digitar enter ou atingir o tamanho máximo.
-void realizar_leitura(char string[], int tam)
-{
-    int i = -1;
-    char c;
-    do
-    {
-        i++;
-        scanf("%c", &c);
-        string[i] = c;
-    } while (i < tam && c != '\n');
-    string[i] = '\0';
-}
 
-// Separa o texto digitado pelo usuário em comando e restante.
-void separar_prompt_usuario(char texto_digitado[], char comando[])
-{
-    int i = 0, j;
-    comando[0] = '\0';
-    while (i < strlen(texto_digitado) && texto_digitado[i] != ' ' && texto_digitado[i] != '/')
-    {
-        comando[i] = texto_digitado[i];
-        i++;
-    }
-    comando[i] = '\0';
-    if (texto_digitado[i] != '\0')
-        i++;
-    for (j = 0; j < strlen(texto_digitado); j++)
-    {
-        texto_digitado[j] = texto_digitado[i];
-        i++;
-    }
-    texto_digitado[j] = '\0';
-}
 
 // Verificar se o nome escontra-se no diretório atual, se sim retorna 0, caso contrario 1.
 int verificar_nome_diretorio(int num_dir, char *nome_arq)
@@ -144,6 +147,31 @@ int verificar_nome_diretorio(int num_dir, char *nome_arq)
     {
         valida = 0;
         printf("\nJA EXISTE ARQUIVO COM ESSE NOME NO DIRETORIO!!");
+    }
+    return valida;
+}
+
+// Busca em árvore binária pelo nome do diretório a partir do inode.
+int buscar_nome_por_inode(tp_no *raiz, int num_inode, char *nome_encontrado)
+{
+    int valida = 0;
+    if (raiz != NULL)
+    {
+        // Verifica se o n� atual contem o inode desejado.
+        if (raiz->info.num_inode == num_inode && strcmp(raiz->info.nome, ".") != 0 && strcmp(raiz->info.nome, "..") != 0)
+        {
+            strcpy(nome_encontrado, raiz->info.nome);
+            valida = 1;
+        }
+
+        if (valida == 0)
+        {
+            // Percorendo a �rvore.
+            if (buscar_nome_por_inode(raiz->esq, num_inode, nome_encontrado))
+                valida = 1;
+            if (buscar_nome_por_inode(raiz->dir, num_inode, nome_encontrado))
+                valida = 1;
+        }
     }
     return valida;
 }
